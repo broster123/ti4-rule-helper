@@ -1,6 +1,2 @@
-<<<<<<< HEAD
-streamlit
-=======
 openai
 streamlit
->>>>>>> d05bb05 (Add Streamlit Cloud deployment app)
