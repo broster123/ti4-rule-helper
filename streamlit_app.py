@@ -1,7 +1,6 @@
-"""Streamlit Community Cloud entrypoint.
+"""Streamlit Community Cloud entrypoint."""
 
-The app implementation lives in main.py so it can also be run locally with
-`streamlit run main.py`.
-"""
+from main import run_app
 
-import main  # noqa: F401
+
+run_app()

@@ -152,55 +152,60 @@ def ask_rules_question(
     return response.output_text, collect_sources(response)
 
 
-st.set_page_config(page_title="TI4 Rules GPT", page_icon="📘", layout="centered")
+def run_app() -> None:
+    st.set_page_config(page_title="TI4 Rules GPT", page_icon="📘", layout="centered")
 
-st.title("TI4 Rules GPT")
-st.caption("Ask questions against the TI4 rules vector store.")
+    st.title("TI4 Rules GPT")
+    st.caption("Ask questions against the TI4 rules vector store.")
 
-config, missing_settings = load_config()
-if missing_settings:
-    st.error("App configuration is incomplete. Ask the app owner to configure Streamlit secrets.")
-    st.info("Missing secret(s): " + ", ".join(missing_settings))
-    st.stop()
+    config, missing_settings = load_config()
+    if missing_settings:
+        st.error("App configuration is incomplete. Ask the app owner to configure Streamlit secrets.")
+        st.info("Missing secret(s): " + ", ".join(missing_settings))
+        st.stop()
 
-if not password_gate(config.app_password):
-    st.stop()
+    if not password_gate(config.app_password):
+        st.stop()
 
-with st.sidebar:
-    st.header("Rules Context")
-    expansion_context = st.selectbox("Rules context", options=list(EXPANSION_CONTEXTS))
-    if st.button("Lock app"):
-        st.session_state["authenticated"] = False
-        st.rerun()
+    with st.sidebar:
+        st.header("Rules Context")
+        expansion_context = st.selectbox("Rules context", options=list(EXPANSION_CONTEXTS))
+        if st.button("Lock app"):
+            st.session_state["authenticated"] = False
+            st.rerun()
 
-user_input = st.text_area(
-    "Question",
-    placeholder="Example: How do I set up objectives during setup?",
-    height=160,
-)
+    user_input = st.text_area(
+        "Question",
+        placeholder="Example: How do I set up objectives during setup?",
+        height=160,
+    )
 
-submit = st.button("Ask", type="primary", disabled=not user_input.strip())
+    submit = st.button("Ask", type="primary", disabled=not user_input.strip())
 
-if submit:
-    with st.spinner("Searching the vector store..."):
-        try:
-            prompt = build_prompt(user_input, expansion_context)
-            answer, sources = ask_rules_question(
-                api_key=config.api_key,
-                vector_store_id=config.vector_store_id,
-                model=config.model,
-                user_input=prompt,
-            )
-        except OpenAIError as exc:
-            st.error(f"OpenAI API error: {exc}")
-        except Exception as exc:
-            st.error(f"Unexpected error: {exc}")
-        else:
-            st.subheader("Answer")
-            st.markdown(answer)
-            st.subheader("Cited files")
-            if sources:
-                for source in sources:
-                    st.markdown(f"- `{source.filename}` (`{source.file_id}`)")
+    if submit:
+        with st.spinner("Searching the vector store..."):
+            try:
+                prompt = build_prompt(user_input, expansion_context)
+                answer, sources = ask_rules_question(
+                    api_key=config.api_key,
+                    vector_store_id=config.vector_store_id,
+                    model=config.model,
+                    user_input=prompt,
+                )
+            except OpenAIError as exc:
+                st.error(f"OpenAI API error: {exc}")
+            except Exception as exc:
+                st.error(f"Unexpected error: {exc}")
             else:
-                st.caption("No citation annotations were returned; rely on the inline citations in the answer.")
+                st.subheader("Answer")
+                st.markdown(answer)
+                st.subheader("Cited files")
+                if sources:
+                    for source in sources:
+                        st.markdown(f"- `{source.filename}` (`{source.file_id}`)")
+                else:
+                    st.caption("No citation annotations were returned; rely on the inline citations in the answer.")
+
+
+if __name__ == "__main__":
+    run_app()
