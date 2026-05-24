@@ -6,7 +6,7 @@ import streamlit as st
 from openai import OpenAI, OpenAIError
 
 
-DEFAULT_MODEL = "gpt-5.5"
+DEFAULT_MODEL = "gpt-5.2"
 MANIFEST_INSTRUCTIONS = """Vector store navigation:
 - Use `000_vector_store_manifest.md` as the map for this vector store whenever possible.
 - Consult the manifest to understand filename prefixes, source authority, expansion assumptions, and whether a file is rules reference material or component fact material.
